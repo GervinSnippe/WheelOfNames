@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Berk Veiligheidsrad</title>
+    <title>Taskforce BERK Veiligheidsrad</title>
     <style>
         /* Algemene styling */
         body {
@@ -80,7 +80,7 @@
 </head>
 <body>
     <header>
-        <h1>Team Berk Veiligheidsrad</h1>
+        <h1>Taskforce BERK Veiligheidsrad</h1>
         <p>Laat veiligheid groeien zoals berkenbomen</p>
     </header>
 
@@ -88,6 +88,7 @@
     <div id="controls">
         <input type="text" id="nameInput" placeholder="Voeg een naam toe">
         <button id="addName">Naam toevoegen</button>
+        <button id="removeName">Naam verwijderen</button>
         <button id="spin">Draai het rad</button>
     </div>
     <div id="result"></div>
@@ -99,17 +100,18 @@
         const colors = ["#B8D430", "#3AB745", "#029990", "#3501CB", "#2E2C75", 
                         "#673A7E", "#CC0071", "#F80120", "#F35B20", "#FB9A00"];
 
-        const arc = Math.PI * 2 / names.length;
+        let currentAngle = 0;
         let spinAngleStart = 0;
         let spinTime = 0;
         let spinTimeTotal = 0;
 
         function drawWheel() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             const numSegments = names.length;
+            const arc = Math.PI * 2 / numSegments;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i = 0; i < numSegments; i++) {
-                const angle = i * Math.PI * 2 / numSegments;
+                const angle = currentAngle + i * arc;
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.beginPath();
                 ctx.moveTo(250, 250);
@@ -152,21 +154,18 @@
                 stopRotateWheel();
                 return;
             }
-            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-            ctx.save();
-            ctx.translate(250, 250);
-            ctx.rotate(spinAngle * Math.PI / 180);
-            ctx.translate(-250, -250);
+            const spinAngle = spinAngleStart * (spinTimeTotal - spinTime) / spinTimeTotal;
+            currentAngle += (spinAngle * Math.PI / 180);
             drawWheel();
-            ctx.restore();
             requestAnimationFrame(rotateWheel);
         }
 
         function stopRotateWheel() {
-            const degrees = spinAngleStart - easeOut(spinTimeTotal, 0, spinAngleStart, spinTimeTotal);
-            const segmentSize = 360 / names.length;
-            const selectedIndex = Math.floor((degrees % 360) / segmentSize);
-            const winner = names[(names.length - selectedIndex) % names.length];
+            const degrees = currentAngle * 180 / Math.PI % 360;
+            const numSegments = names.length;
+            const segmentSize = 360 / numSegments;
+            const selectedIndex = Math.floor((360 - degrees) / segmentSize) % numSegments;
+            const winner = names[selectedIndex];
             document.getElementById("result").textContent = `Gekozen persoon: ${winner} moet iets vertellen over veiligheid!`;
         }
 
@@ -181,6 +180,17 @@
             const name = nameInput.value.trim();
             if (name) {
                 names.push(name);
+                nameInput.value = "";
+                drawWheel();
+            }
+        });
+
+        document.getElementById("removeName").addEventListener("click", () => {
+            const nameInput = document.getElementById("nameInput");
+            const name = nameInput.value.trim();
+            const index = names.indexOf(name);
+            if (index !== -1) {
+                names.splice(index, 1);
                 nameInput.value = "";
                 drawWheel();
             }
