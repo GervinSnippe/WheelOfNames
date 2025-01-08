@@ -1,31 +1,194 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wheel of Names</title>
-  <!-- Link naar je CSS bestand (die we straks maken) -->
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Berk Veiligheidsrad</title>
+    <style>
+        /* Algemene styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('https://source.unsplash.com/1920x1080/?birch-forest') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin: 10px 0 0;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        /* Canvas voor het rad */
+        #wheelcanvas {
+            margin: 20px auto;
+            display: block;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 5px solid #4CAF50;
+            border-radius: 50%;
+        }
+
+        /* Knoppen en invoer */
+        #controls {
+            margin-top: 20px;
+        }
+
+        button, input {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #nameInput {
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Resultaat */
+        #result {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
 <body>
-  <h1>Wheel of Names</h1>
-  
-  <!-- Invoer van namen -->
-  <textarea id="names" rows="5" cols="30" placeholder="Vul hier namen in, elke naam op een nieuwe regel"></textarea>
-  <br />
-  <button id="spinBtn">Draai aan het Rad!</button>
-  <button id="resetBtn">Reset geselecteerde naam</button>
+    <header>
+        <h1>Team Berk Veiligheidsrad</h1>
+        <p>Laat veiligheid groeien zoals berkenbomen</p>
+    </header>
 
-  <!-- Het 'rad' (we doen dit met een simpele animatie in CSS + JS) -->
-  <div id="wheel">
-    <div id="innerWheel"></div>
-    <div id="pointer">▼</div>
-  </div>
+    <canvas id="wheelcanvas" width="500" height="500"></canvas>
+    <div id="controls">
+        <input type="text" id="nameInput" placeholder="Voeg een naam toe">
+        <button id="addName">Naam toevoegen</button>
+        <button id="spin">Draai het rad</button>
+    </div>
+    <div id="result"></div>
 
-  <!-- De gekozen naam -->
-  <p id="chosenName"></p>
+    <script>
+        const canvas = document.getElementById("wheelcanvas");
+        const ctx = canvas.getContext("2d");
+        let names = ["Jan", "Piet", "Kees"]; // Standaardnamen
+        const colors = ["#B8D430", "#3AB745", "#029990", "#3501CB", "#2E2C75", 
+                        "#673A7E", "#CC0071", "#F80120", "#F35B20", "#FB9A00"];
 
-  <!-- Link naar je JavaScript bestand -->
-  <script src="script.js"></script>
+        const arc = Math.PI * 2 / names.length;
+        let spinAngleStart = 0;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const numSegments = names.length;
+
+            for (let i = 0; i < numSegments; i++) {
+                const angle = i * Math.PI * 2 / numSegments;
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 200, angle, angle + arc, false);
+                ctx.lineTo(250, 250);
+                ctx.fill();
+
+                // Tekst tekenen
+                ctx.save();
+                ctx.translate(250 + Math.cos(angle + arc / 2) * 150,
+                              250 + Math.sin(angle + arc / 2) * 150);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                ctx.fillStyle = "#000";
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = "center";
+                ctx.fillText(names[i], 0, 0);
+                ctx.restore();
+            }
+
+            // Pijl
+            ctx.fillStyle = "#FF0000";
+            ctx.beginPath();
+            ctx.moveTo(250 - 10, 250 - 220);
+            ctx.lineTo(250 + 10, 250 - 220);
+            ctx.lineTo(250, 250 - 190);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function spin() {
+            spinAngleStart = Math.random() * 10 + 10;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 3000 + 4000;
+            rotateWheel();
+        }
+
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            ctx.save();
+            ctx.translate(250, 250);
+            ctx.rotate(spinAngle * Math.PI / 180);
+            ctx.translate(-250, -250);
+            drawWheel();
+            ctx.restore();
+            requestAnimationFrame(rotateWheel);
+        }
+
+        function stopRotateWheel() {
+            const degrees = spinAngleStart - easeOut(spinTimeTotal, 0, spinAngleStart, spinTimeTotal);
+            const segmentSize = 360 / names.length;
+            const selectedIndex = Math.floor((degrees % 360) / segmentSize);
+            const winner = names[(names.length - selectedIndex) % names.length];
+            document.getElementById("result").textContent = `Gekozen persoon: ${winner} moet iets vertellen over veiligheid!`;
+        }
+
+        function easeOut(t, b, c, d) {
+            const ts = (t /= d) * t;
+            const tc = ts * t;
+            return b + c * (tc + -3 * ts + 3 * t);
+        }
+
+        document.getElementById("addName").addEventListener("click", () => {
+            const nameInput = document.getElementById("nameInput");
+            const name = nameInput.value.trim();
+            if (name) {
+                names.push(name);
+                nameInput.value = "";
+                drawWheel();
+            }
+        });
+
+        document.getElementById("spin").addEventListener("click", spin);
+
+        drawWheel();
+    </script>
 </body>
 </html>
