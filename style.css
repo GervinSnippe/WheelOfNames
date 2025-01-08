@@ -1,0 +1,62 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 20px;
+}
+
+#names {
+  width: 200px;
+  margin: 10px auto;
+}
+
+#spinBtn, #resetBtn {
+  padding: 10px 20px;
+  margin: 10px 5px;
+  cursor: pointer;
+}
+
+#wheel {
+  margin: 20px auto;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border: 5px solid #333;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#innerWheel {
+  width: 200px;
+  height: 200px;
+  background: conic-gradient(
+    #f00 0deg 30deg,
+    #ff0 30deg 60deg,
+    #0f0 60deg 90deg,
+    #0ff 90deg 120deg,
+    #00f 120deg 150deg,
+    #f0f 150deg 180deg,
+    #f00 180deg 210deg,
+    #ff0 210deg 240deg,
+    #0f0 240deg 270deg,
+    #0ff 270deg 300deg,
+    #00f 300deg 330deg,
+    #f0f 330deg 360deg
+  );
+  border-radius: 50%;
+  transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+  /* Dit is de animatie: transform met 4 seconden */
+}
+
+#pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+}
+
+#chosenName {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  font-weight: bold;
+}
