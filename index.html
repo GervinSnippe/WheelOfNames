@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wheel of Names</title>
+  <!-- Link naar je CSS bestand (die we straks maken) -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Wheel of Names</h1>
+  
+  <!-- Invoer van namen -->
+  <textarea id="names" rows="5" cols="30" placeholder="Vul hier namen in, elke naam op een nieuwe regel"></textarea>
+  <br />
+  <button id="spinBtn">Draai aan het Rad!</button>
+  <button id="resetBtn">Reset geselecteerde naam</button>
+
+  <!-- Het 'rad' (we doen dit met een simpele animatie in CSS + JS) -->
+  <div id="wheel">
+    <div id="innerWheel"></div>
+    <div id="pointer">▼</div>
+  </div>
+
+  <!-- De gekozen naam -->
+  <p id="chosenName"></p>
+
+  <!-- Link naar je JavaScript bestand -->
+  <script src="script.js"></script>
+</body>
+</html>
